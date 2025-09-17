@@ -2,18 +2,24 @@ import argparse
 import yaml
 
 class Parser:
+
     def __init__(self):
-        self.parser = argparse.ArgumentParser()
+
+        self.parser = argparse.ArgumentParser(description="Load experiment configuration")
         self.parser.add_argument(
             "-c", "--config", required=True, help="Path to config.yaml"
         )
 
-    def parse_args(self):
-        """Parse CLI arguments."""
-        return self.parser.parse_args()
+    def parse(self):
+        """
+        Parse CLI arguments and load the YAML configuration.
+        Returns:
+            dict: Configuration dictionary from YAML file.
+        """
 
-    @staticmethod
-    def load_config(config_path: str):
-        """Load YAML config file."""
-        with open(config_path, "r") as f:
-            return yaml.safe_load(f)
+        args = self.parser.parse_args()
+        
+        with open(args.config, "r") as f:
+            config = yaml.safe_load(f)
+
+        return config
