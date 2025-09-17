@@ -1,0 +1,2 @@
+models: ['FCN', 'MLP']
+datasets: ['Covid3Month']
