@@ -30,12 +30,6 @@ from train_utils import train_model, evaluate_model, scatter_ytrue_ypred
 EXPERIMENT_DATE = time.strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = '../outputs/'
 
-results_data_dir = {
-    'model': [], 'dataset': [], 'mse': [],
-    'mae': [], 'r2': [], 'rmse': [],
-    'best_train_loss': [], 'time': []
-}
-
 def main():
 
     # Load config.yaml.
@@ -49,16 +43,22 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f'\nDevice: {device}')
 
-    for dataset_name in DATASETS:
-        print(f"\n=== Dataset {dataset_name} ===")
-        datam = DatasetManager(name=dataset_name, device=device)
-        train_loader, test_loader = datam.load_dataloader_for_training()
+    for model_name in MODELS:
+        print(f"\n=== Model: {model_name} ===")
 
-        # Infer first batch for input size.
-        first_batch = next(iter(train_loader))
+        results_data_dir = {
+            'model': [], 'dataset': [], 'mse': [],
+            'mae': [], 'r2': [], 'rmse': [],
+            'best_train_loss': [], 'time': []
+        }
 
-        for model_name in MODELS:
-            print(f"\n--- Model: {model_name} ---")
+        for dataset_name in DATASETS:
+            print(f"\n--- Dataset {dataset_name} ---")
+            datam = DatasetManager(name=dataset_name, device=device)
+            train_loader, test_loader = datam.load_dataloader_for_training()
+
+            # Infer first batch for input size.
+            first_batch = next(iter(train_loader))
 
             # Instantiate model dynamically.
             manager = ModelManager(model_name)

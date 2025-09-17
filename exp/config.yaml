@@ -13,4 +13,4 @@ lr: 0.001
 betas: [0.9, 0.999]
 eps: 1e-8
 num_epochs: 2000
-patience: 2
+patience: 50
