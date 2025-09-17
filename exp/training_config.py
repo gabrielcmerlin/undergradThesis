@@ -40,6 +40,7 @@ def get_training_params(config, model_params=None):
             raise ValueError(f"Unknown optimizer '{optimizer_name}'")
 
     num_epochs = config.get("num_epochs", 100)
+    patience = config.get("patience", 10)
 
     return {
         "criterion": criterion,
@@ -47,5 +48,6 @@ def get_training_params(config, model_params=None):
         "lr": lr,
         "betas": betas,
         "eps": eps,
-        "num_epochs": num_epochs
+        "num_epochs": num_epochs,
+        "patience": patience
     }

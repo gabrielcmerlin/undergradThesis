@@ -1,12 +1,31 @@
+import numpy as np
 import torch
-import os
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-def train_model(model, train_loader, criterion, optimizer, device, num_epochs=100):
+def train_model(model, train_loader, criterion, optimizer, device, 
+                num_epochs=100, patience=10, print_every=1):
     """
-    Train the model and return it after training.
+    Train the model and return the model with the lowest training loss.
+    Early stopping is applied based on training loss.
+    
+    Args:
+        model: PyTorch model
+        train_loader: DataLoader for training data
+        criterion: loss function
+        optimizer: optimizer
+        device: 'cpu' or 'cuda'
+        num_epochs: maximum number of epochs
+        patience: stop training if no improvement for this many epochs
+        print_every: interval to print training loss
     """
     
     model.train()
+    best_loss = float('inf')
+    train_losses = []
+    best_model_state = None
+    epochs_no_improve = 0
 
     for epoch in range(1, num_epochs + 1):
         total_loss = 0.0
@@ -22,9 +41,29 @@ def train_model(model, train_loader, criterion, optimizer, device, num_epochs=10
             total_loss += loss.item() * X.size(0)
 
         avg_loss = total_loss / len(train_loader.dataset)
-        print(f"Epoch {epoch}/{num_epochs} | Train Loss: {avg_loss:.6f}")
+        train_losses.append(avg_loss)
 
-    return model
+        if epoch % print_every == 0 or epoch == 1:
+            print(f"Epoch {epoch}/{num_epochs} | Train Loss: {avg_loss:.6f}")
+
+        # Check for improvement.
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            best_model_state = model.state_dict()
+            epochs_no_improve = 0
+        else:
+            epochs_no_improve += 1
+
+        # Early stopping.
+        if epochs_no_improve >= patience:
+            print(f"Early stopping at epoch {epoch}. Best training loss: {best_loss:.6f}")
+            break
+
+    # Load best model weights.
+    if best_model_state is not None:
+        model.load_state_dict(best_model_state)
+
+    return model, best_loss, train_losses
 
 def evaluate_model(model, test_loader, criterion, device):
     """
@@ -33,14 +72,50 @@ def evaluate_model(model, test_loader, criterion, device):
 
     model.eval()
     total_loss = 0.0
+
+    all_preds, all_labels = [], []
     with torch.no_grad():
         for X, y in test_loader:
             X, y = X.to(device), y.to(device)
             outputs = model(X)
+
             loss = criterion(outputs, y)
             total_loss += loss.item() * X.size(0)
 
+            preds = outputs.cpu().numpy().flatten()
+            all_preds.extend(preds)
+            all_labels.extend(y.numpy().flatten())
+
     avg_loss = total_loss / len(test_loader.dataset)
-    print(f"\nTest Loss: {avg_loss:.6f}\n")
+    print(f"\nTest Loss: {avg_loss:.6f}")
     
-    return avg_loss
+    mse = mean_squared_error(all_labels, all_preds)
+    mae = mean_absolute_error(all_labels, all_preds)
+    r2 = r2_score(all_labels, all_preds)
+    rmse = np.sqrt(mse)
+
+    return {
+            'mse': mse, 
+            'mae': mae,
+            'r2': r2,
+            'rmse': rmse,
+            'y_true': all_labels,
+            'y_pred': all_preds
+            }
+
+def scatter_ytrue_ypred(y_true, y_pred, title, save_path):
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=y_true, y=y_pred, alpha=0.6)
+    plt.plot([min(y_true), max(y_true)], [min(y_true), max(y_true)], 'r--', label='Ideal (y = x)')
+    plt.xlabel("Valores reais (y_true)")
+    plt.ylabel("Predições (y_pred)")
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()

@@ -1,5 +1,8 @@
 import os
 import sys
+import time
+import pandas as pd
+import json
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +25,16 @@ from Parser import Parser
 from DatasetManager import DatasetManager
 from models.ModelManager import ModelManager
 from training_config import get_training_params
-from train_utils import train_model, evaluate_model
+from train_utils import train_model, evaluate_model, scatter_ytrue_ypred
+
+EXPERIMENT_DATE = time.strftime("%Y%m%d_%H%M%S")
+RESULTS_DIR = '../outputs/'
+
+results_data_dir = {
+    'model': [], 'dataset': [], 'mse': [],
+    'mae': [], 'r2': [], 'rmse': [],
+    'best_train_loss': [], 'time': []
+}
 
 def main():
 
@@ -58,19 +70,43 @@ def main():
             criterion = training_params["criterion"]
             optimizer = training_params["optimizer"]
             num_epochs = training_params["num_epochs"]
+            patience = training_params["patience"]
 
             # Train the model.
-            trained_model = train_model(
+            start = time.time()
+            trained_model, best_loss, train_losses = train_model(
                 model=model,
                 train_loader=train_loader,
                 criterion=criterion,
                 optimizer=optimizer,
                 device=device,
                 num_epochs=num_epochs,
+                patience=patience
             )
+            elapsed = time.time() - start
+
+            with open(f'{RESULTS_DIR}losses/{model_name}/{model_name}_{dataset_name}.json', 'w') as f:
+                json.dump(train_losses, f)
 
             # Evaluate model.
-            evaluate_model(trained_model, test_loader, criterion, device)
+            metrics = evaluate_model(trained_model, test_loader, criterion, device)
+
+            scatter_ytrue_ypred(metrics['y_true'], metrics['y_pred'],
+                            title=f"{dataset_name}",
+                            save_path=f'{RESULTS_DIR}scatter/{model_name}/{model_name}_{dataset_name}.png')
+
+            # Store results.
+            results_data_dir['model'].append(model_name)
+            results_data_dir['dataset'].append(dataset_name)
+            results_data_dir['mse'].append(metrics['mse'])
+            results_data_dir['mae'].append(metrics['mae'])
+            results_data_dir['r2'].append(metrics['r2'])
+            results_data_dir['rmse'].append(metrics['rmse'])
+            results_data_dir['best_train_loss'].append(best_loss)
+            results_data_dir['time'].append(elapsed)
+
+            pd.DataFrame(results_data_dir).to_csv(f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv", index=False)
+    print("Done.")
 
 if __name__ == "__main__":
     main()
