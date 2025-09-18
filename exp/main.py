@@ -12,7 +12,7 @@ import random
 import numpy as np
 import torch
 
-# Fix random seeds for reproducibility
+# Fix random seeds for reproducibility.
 seed = 42
 random.seed(seed)
 np.random.seed(seed)

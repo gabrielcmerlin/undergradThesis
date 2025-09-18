@@ -4,6 +4,11 @@ import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 
 class DatasetManager:
+    """
+    Handles data loading in a dataset-agnostic way, allowing the use of 
+    different datasets without modifying the main code.
+    """
+
     def __init__(self, name, device, batch_size=32):
         self.dtype = torch.get_default_dtype()
         self.dataset_name = name

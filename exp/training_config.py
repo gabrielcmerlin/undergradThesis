@@ -6,13 +6,6 @@ def get_training_params(config, model_params=None):
     """
     Extracts all training parameters from config and returns
     criterion, optimizer, learning rate, betas, eps, and num_epochs.
-    
-    Args:
-        config (dict): Dictionary loaded from YAML.
-        model_params (dict, optional): Extra params needed for optimizer (like model.parameters())
-    
-    Returns:
-        dict: Contains 'criterion', 'optimizer', 'num_epochs'
     """
 
     # Loss function.
