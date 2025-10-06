@@ -9,7 +9,7 @@ class DatasetManager:
     different datasets without modifying the main code.
     """
 
-    def __init__(self, name, device, batch_size=32):
+    def __init__(self, name, device, batch_size):
         self.dtype = torch.get_default_dtype()
         self.dataset_name = name
         self.batch_size = batch_size

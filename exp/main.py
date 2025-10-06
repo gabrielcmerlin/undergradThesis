@@ -39,6 +39,7 @@ def main():
     # Extract datasets and models.
     DATASETS = config.get("datasets", [])
     MODELS = config.get("models", [])
+    BATCH_SIZE = config.get("batch_size", 16)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f'\nDevice: {device}')
@@ -54,7 +55,7 @@ def main():
 
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
-            datam = DatasetManager(name=dataset_name, device=device)
+            datam = DatasetManager(name=dataset_name, device=device, batch_size=BATCH_SIZE)
             train_loader, test_loader = datam.load_dataloader_for_training()
 
             # Infer first batch for input size.

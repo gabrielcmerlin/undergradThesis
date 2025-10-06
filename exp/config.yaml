@@ -12,11 +12,11 @@ datasets:
   # - FloodModeling1
   # - HouseholdPowerConsumption2
   # - LiveFuelMoistureContent
-  - BIDMC32SpO2
+  - BIDMC32HR
 
   # - Covid3Month
   # - HouseholdPowerConsumption1
-  - BIDMC32HR
+  - BIDMC32SpO2
   - BeijingPM25Quality
             
   # - FloodModeling2
@@ -36,3 +36,4 @@ betas: [0.9, 0.999]
 eps: 1e-8
 num_epochs: 2000
 patience: 50
+batch_size: 16
