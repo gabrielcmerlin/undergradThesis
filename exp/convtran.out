@@ -1,0 +1,38 @@
+
+Device: cuda
+
+=== Model: ConvTran ===
+
+--- Dataset BIDMC32SpO2 ---
+/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/functional.py:554: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /pytorch/aten/src/ATen/native/TensorShape.cpp:4322.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/nn/modules/conv.py:543: UserWarning: Using padding='same' with even kernel lengths and odd dilation may require a zero-padded copy of the input be created (Triggered internally at /pytorch/aten/src/ATen/native/Convolution.cpp:1027.)
+  return F.conv2d(
+Traceback (most recent call last):
+  File "/home/labic/merlin_codes/thesis/undergradThesis/exp/main.py", line 112, in <module>
+    main()
+  File "/home/labic/merlin_codes/thesis/undergradThesis/exp/main.py", line 77, in main
+    trained_model, best_loss, train_losses = train_model(
+                                             ^^^^^^^^^^^^
+  File "/home/labic/merlin_codes/thesis/undergradThesis/exp/train_utils.py", line 25, in train_model
+    outputs = model(X)  # Forward pass
+              ^^^^^^^^
+  File "/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/labic/merlin_codes/thesis/undergradThesis/models/ConvTran.py", line 77, in forward
+    att = x_src + self.attention_layer(x_src_pos)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/labic/miniconda3/envs/merlin_thesis/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/labic/merlin_codes/thesis/undergradThesis/models/Attention.py", line 77, in forward
+    attn = torch.matmul(q, k) * self.scale
+           ^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 15.26 GiB. GPU 0 has a total capacity of 11.63 GiB of which 10.44 GiB is free. Including non-PyTorch memory, this process has 590.00 MiB memory in use. Of the allocated memory 415.90 MiB is allocated by PyTorch, and 44.10 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
