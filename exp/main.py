@@ -3,6 +3,7 @@ import sys
 import time
 import pandas as pd
 import json
+import gc
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +41,7 @@ def main():
     DATASETS = config.get("datasets", [])
     MODELS = config.get("models", [])
     BATCH_SIZE = config.get("batch_size", 16)
+    BATCH_DIVISIONS = config.get("batch_divisions", 8)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f'\nDevice: {device}')
@@ -81,16 +83,23 @@ def main():
                 criterion=criterion,
                 optimizer=optimizer,
                 device=device,
+                batch_size=BATCH_SIZE,
                 num_epochs=num_epochs,
-                patience=patience
+                patience=patience,
+                batch_divisions=BATCH_DIVISIONS
             )
             elapsed = time.time() - start
 
             with open(f'{RESULTS_DIR}losses/{model_name}/{model_name}_{dataset_name}.json', 'w') as f:
                 json.dump(train_losses, f)
 
+            # Limpar memória do treino
+            del model, optimizer, train_loader, train_losses
+            gc.collect()
+            torch.cuda.empty_cache()
+
             # Evaluate model.
-            metrics = evaluate_model(trained_model, test_loader, criterion, device)
+            metrics = evaluate_model(trained_model, test_loader, criterion, device, batch_divisions=BATCH_DIVISIONS)
 
             scatter_ytrue_ypred(metrics['y_true'], metrics['y_pred'],
                             title=f"{dataset_name}",

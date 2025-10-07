@@ -56,7 +56,7 @@ class DatasetManager:
         train_ds = TensorDataset(X_tr, self.y_train)
         test_ds = TensorDataset(X_te, self.y_test)
 
-        train_loader = DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=16)
-        test_loader = DataLoader(test_ds, batch_size=self.batch_size, shuffle=False, num_workers=16)
+        train_loader = DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=False)
+        test_loader = DataLoader(test_ds, batch_size=self.batch_size, shuffle=False, num_workers=4, pin_memory=False)
 
         return train_loader, test_loader
