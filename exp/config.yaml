@@ -12,21 +12,24 @@ datasets:
   # - FloodModeling1
   # - HouseholdPowerConsumption2
   # - LiveFuelMoistureContent
-  # - BeijingPM25Quality
+  - BeijingPM25Quality
 
   # - Covid3Month
   # - HouseholdPowerConsumption1
-  - BIDMC32SpO2
-  # - BIDMC32HR
             
   # - FloodModeling2
   # - IEEEPPG
-  # - BIDMC32RR
 
   # - NewsHeadlineSentiment
   # - NewsTitleSentiment
   # - AustraliaRainfall
   # - PPGDalia
+  
+  - BIDMC32SpO2
+
+  # - BIDMC32HR
+
+  # - BIDMC32RR
 
 # Training hyperparameters
 criterion: 'MSELoss'
@@ -34,7 +37,7 @@ optimizer: 'Adam'
 lr: 0.001
 betas: [0.9, 0.999]
 eps: 1e-8
-num_epochs: 1
+num_epochs: 2000
 patience: 50
 batch_size: 32
 batch_divisions: 8
