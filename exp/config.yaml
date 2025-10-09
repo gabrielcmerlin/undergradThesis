@@ -1,7 +1,8 @@
 models: 
   # - 'MLP'
   # - 'FCN'
-  - 'ConvTran'
+  # - 'ConvTran'
+  - 'TSERMamba'
 
 datasets: 
   # - AppliancesEnergy
@@ -12,20 +13,20 @@ datasets:
   # - FloodModeling1
   # - HouseholdPowerConsumption2
   # - LiveFuelMoistureContent
-  - BeijingPM25Quality
+  # - BeijingPM25Quality
 
   # - Covid3Month
   # - HouseholdPowerConsumption1
             
   # - FloodModeling2
-  # - IEEEPPG
+  - IEEEPPG
 
   # - NewsHeadlineSentiment
   # - NewsTitleSentiment
   # - AustraliaRainfall
   # - PPGDalia
   
-  - BIDMC32SpO2
+  # - BIDMC32SpO2
 
   # - BIDMC32HR
 
@@ -40,4 +41,4 @@ eps: 1e-8
 num_epochs: 2000
 patience: 50
 batch_size: 32
-batch_divisions: 8
+batch_divisions: 1

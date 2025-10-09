@@ -4,14 +4,28 @@ import time
 import pandas as pd
 import json
 import gc
+import random
+import numpy as np
+import torch
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-import random
-import numpy as np
-import torch
+from Parser import Parser
+from DatasetManager import DatasetManager, DatasetManagerTSERMamba
+from models.ModelManager import ModelManager
+from training_config import get_training_params
+from train_utils import (
+    train_model,
+    evaluate_model,
+    scatter_ytrue_ypred,
+    train_TSERMamba,
+    evaluate_TSERMamba,
+)
+
+EXPERIMENT_DATE = time.strftime("%Y%m%d_%H%M%S")
+RESULTS_DIR = '../outputs/'
 
 # Fix random seeds for reproducibility.
 seed = 42
@@ -22,17 +36,8 @@ torch.cuda.manual_seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-from Parser import Parser
-from DatasetManager import DatasetManager
-from models.ModelManager import ModelManager
-from training_config import get_training_params
-from train_utils import train_model, evaluate_model, scatter_ytrue_ypred
-
-EXPERIMENT_DATE = time.strftime("%Y%m%d_%H%M%S")
-RESULTS_DIR = '../outputs/'
 
 def main():
-
     # Load config.yaml.
     parser = Parser()
     config = parser.parse()
@@ -55,18 +60,36 @@ def main():
             'best_train_loss': [], 'time': []
         }
 
+        # Decide which functions and dataset class to use based on the model.
+        if model_name.lower() == "tsermamba":
+            train_fn = train_TSERMamba
+            eval_fn = evaluate_TSERMamba
+            dataset_class = DatasetManagerTSERMamba
+            scatter_fn = scatter_ytrue_ypred  # TSERMamba still uses scatter for plotting
+            print("→ Using TSERMamba training/evaluation functions.")
+        else:
+            train_fn = train_model
+            eval_fn = evaluate_model
+            dataset_class = DatasetManager
+            scatter_fn = scatter_ytrue_ypred
+            print("→ Using standard training/evaluation functions.")
+
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
-            datam = DatasetManager(name=dataset_name, device=device, batch_size=BATCH_SIZE)
+            print('Carregani dataset')
+            datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
             train_loader, test_loader = datam.load_dataloader_for_training()
 
-            # Infer first batch for input size.
-            first_batch = next(iter(train_loader))
-
-            # Instantiate model dynamically.
-            manager = ModelManager(model_name)
-            model = manager.get_model(first_batch)
-            model.to(device)
+            print('Carregani modeli')
+            if model_name.lower() == "tsermamba":
+                manager = ModelManager(model_name)
+                model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
+                model.to(device)
+            else:
+                # Instantiate model dynamically.
+                manager = ModelManager(model_name)
+                model = manager.get_model(first_batch)
+                model.to(device)
 
             # Get training hyperparameters from config.
             training_params = get_training_params(config, model.parameters())
@@ -76,8 +99,9 @@ def main():
             patience = training_params["patience"]
 
             # Train the model.
+            print('Treinani')
             start = time.time()
-            trained_model, best_loss, train_losses = train_model(
+            trained_model, best_loss, train_losses = train_fn(
                 model=model,
                 train_loader=train_loader,
                 criterion=criterion,
@@ -90,20 +114,24 @@ def main():
             )
             elapsed = time.time() - start
 
+            # Save training loss history.
+            os.makedirs(f'{RESULTS_DIR}losses/{model_name}', exist_ok=True)
             with open(f'{RESULTS_DIR}losses/{model_name}/{model_name}_{dataset_name}.json', 'w') as f:
                 json.dump(train_losses, f)
 
-            # Limpar memória do treino
-            del model, optimizer, train_loader, train_losses
+            # Free training memory.
+            del optimizer, train_loader, train_losses
             gc.collect()
             torch.cuda.empty_cache()
 
             # Evaluate model.
-            metrics = evaluate_model(trained_model, test_loader, criterion, device, batch_divisions=BATCH_DIVISIONS)
+            metrics = eval_fn(trained_model, test_loader, criterion, device, batch_divisions=BATCH_DIVISIONS)
 
-            scatter_ytrue_ypred(metrics['y_true'], metrics['y_pred'],
-                            title=f"{dataset_name}",
-                            save_path=f'{RESULTS_DIR}scatter/{model_name}/{model_name}_{dataset_name}.png')
+            # Scatter plot.
+            os.makedirs(f'{RESULTS_DIR}scatter/{model_name}', exist_ok=True)
+            scatter_fn(metrics['y_true'], metrics['y_pred'],
+                       title=f"{dataset_name}",
+                       save_path=f'{RESULTS_DIR}scatter/{model_name}/{model_name}_{dataset_name}.png')
 
             # Store results.
             results_data_dir['model'].append(model_name)
@@ -115,8 +143,19 @@ def main():
             results_data_dir['best_train_loss'].append(best_loss)
             results_data_dir['time'].append(elapsed)
 
-            pd.DataFrame(results_data_dir).to_csv(f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv", index=False)
-    print("Done.")
+            os.makedirs(f"{RESULTS_DIR}results", exist_ok=True)
+            pd.DataFrame(results_data_dir).to_csv(
+                f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv",
+                index=False
+            )
+
+            # Clean memory.
+            del trained_model, test_loader
+            gc.collect()
+            torch.cuda.empty_cache()
+
+    print("\n✅ All experiments completed successfully.")
+
 
 if __name__ == "__main__":
     main()

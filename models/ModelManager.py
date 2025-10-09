@@ -41,7 +41,7 @@ class ModelManager:
 
         return input_size
 
-    def get_model(self, first_batch=None, **override_kwargs):
+    def get_model(self, first_batch=None, enc_in=None, seq_len=None, **override_kwargs):
         """
         Instantiate the model, automatically computing input_size if first_batch is provided.
         """
@@ -78,6 +78,30 @@ class ModelManager:
             }
 
             return self.model_class(config, num_classes=1)
+        
+        elif self.model_name == 'TSERMamba':
+
+            # Default parameters from parser (matching TSERMamba signature)
+            config = dict(
+                enc_in=enc_in,
+                seq_len=seq_len,
+                projected_space=64,
+                rescale_size=64,
+                patch_size=8,
+                dropout=0.1,
+                initial_focus=1.0,
+                d_state=256,
+                dconv=2,
+                e_fact=1,
+                num_mambas=1,
+                flip_dir=2,
+                output_dim=1
+            )
+
+            # Allow overrides from constructor kwargs or get_model()
+            config.update(kwargs)
+
+            return self.model_class(**config)
         else:
             if first_batch is not None:
                 kwargs["input_size"] = self.infer_input_size(first_batch)
