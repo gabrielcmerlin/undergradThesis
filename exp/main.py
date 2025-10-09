@@ -86,6 +86,9 @@ def main():
                 model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
                 model.to(device)
             else:
+                # Infer first batch for input size.
+                first_batch = next(iter(train_loader))
+                
                 # Instantiate model dynamically.
                 manager = ModelManager(model_name)
                 model = manager.get_model(first_batch)
