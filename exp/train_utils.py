@@ -152,6 +152,7 @@ def scatter_ytrue_ypred(y_true, y_pred, title, save_path=None):
     """
     Plot scatter of true vs predicted values.
     """
+    
     plt.figure(figsize=(8, 6))
     sns.scatterplot(x=y_true, y=y_pred, alpha=0.6)
     plt.plot([min(y_true), max(y_true)], [min(y_true), max(y_true)], 'r--', label='Ideal (y = x)')
@@ -174,6 +175,7 @@ def train_TSERMamba(model, train_loader, criterion, optimizer, device, batch_siz
     Train TSERMamba regression model using two inputs (CWT + raw/another features),
     following the thesis training template and TSCMamba structure.
     """
+
     model.train()
     best_loss = float('inf')
     train_losses = []
@@ -240,6 +242,7 @@ def evaluate_TSERMamba(model, test_loader, criterion, device, batch_divisions=1)
     Evaluate TSERMamba model on regression test data (CWT + another input).
     Computes regression metrics (MSE, MAE, R2, RMSE).
     """
+
     model.eval()
     all_preds, all_labels = [], []
     total_loss = 0.0

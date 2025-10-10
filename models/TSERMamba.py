@@ -1,6 +1,6 @@
 import torch
 from mamba_ssm import Mamba
-from RevIN.RevIN import RevIN
+from models.RevIN import RevIN
 import copy
 from einops.layers.torch import Rearrange
 import numpy as np

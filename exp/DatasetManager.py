@@ -85,11 +85,8 @@ class DatasetManagerTSERMamba(Dataset):
 
         self.dtype = torch.get_default_dtype()
 
-        print('Loading')
         self.load_data()
-        print('CWT')
         self.prepare_cwt()
-        print('ROCKET')
         self.prepare_rocket()
 
     def load_data(self):
@@ -166,8 +163,6 @@ class DatasetManagerTSERMamba(Dataset):
         r_min, r_max = np.min(self.X_train_rocket), np.max(self.X_train_rocket)
         self.X_train_rocket = (self.X_train_rocket - r_min) / (r_max - r_min)
         self.X_test_rocket = (self.X_test_rocket - r_min) / (r_max - r_min)
-
-        print(self.X_train_rocket.shape)
 
     def load_dataloader_for_training(self):
         """Return train/test dataloaders yielding (X_cwt, X_rocket, y)"""

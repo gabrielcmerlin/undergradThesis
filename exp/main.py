@@ -66,21 +66,17 @@ def main():
             eval_fn = evaluate_TSERMamba
             dataset_class = DatasetManagerTSERMamba
             scatter_fn = scatter_ytrue_ypred  # TSERMamba still uses scatter for plotting
-            print("→ Using TSERMamba training/evaluation functions.")
         else:
             train_fn = train_model
             eval_fn = evaluate_model
             dataset_class = DatasetManager
             scatter_fn = scatter_ytrue_ypred
-            print("→ Using standard training/evaluation functions.")
 
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
-            print('Carregani dataset')
             datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
             train_loader, test_loader = datam.load_dataloader_for_training()
 
-            print('Carregani modeli')
             if model_name.lower() == "tsermamba":
                 manager = ModelManager(model_name)
                 model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
@@ -102,7 +98,6 @@ def main():
             patience = training_params["patience"]
 
             # Train the model.
-            print('Treinani')
             start = time.time()
             trained_model, best_loss, train_losses = train_fn(
                 model=model,
@@ -158,7 +153,6 @@ def main():
             torch.cuda.empty_cache()
 
     print("\n✅ All experiments completed successfully.")
-
 
 if __name__ == "__main__":
     main()
