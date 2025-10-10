@@ -1,3 +1,5 @@
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
+exp/rocket_models
+exp/rocket_models/*

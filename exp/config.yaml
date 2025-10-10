@@ -6,11 +6,11 @@ models:
 
 datasets: 
   # - AppliancesEnergy
-  # - FloodModeling3
+  - FloodModeling3
   # - BenzeneConcentration
   # - BeijingPM10Quality
 
-  # - FloodModeling1
+  - FloodModeling1
   # - HouseholdPowerConsumption2
   # - LiveFuelMoistureContent
   # - BeijingPM25Quality
@@ -18,8 +18,8 @@ datasets:
   # - Covid3Month
   # - HouseholdPowerConsumption1
             
-  # - FloodModeling2
-  - IEEEPPG
+  - FloodModeling2
+  # - IEEEPPG
 
   # - NewsHeadlineSentiment
   # - NewsTitleSentiment
