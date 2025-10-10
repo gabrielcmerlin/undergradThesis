@@ -107,12 +107,6 @@ class DatasetManagerTSERMamba(Dataset):
         X_train = (X_train - X_train.mean(axis=2, keepdims=True)) / (X_train.std(axis=2, keepdims=True) + 1e-8)
         X_test = (X_test - X_test.mean(axis=2, keepdims=True)) / (X_test.std(axis=2, keepdims=True) + 1e-8)
 
-        # Remove singleton dimension if present
-        if X_train.ndim == 3 and X_train.shape[1] == 1:
-            X_train = X_train[:, 0, :]
-        if X_test.ndim == 3 and X_test.shape[1] == 1:
-            X_test = X_test[:, 0, :]
-
         self.seq_len = max(X_train.shape[1],X_test.shape[1])
 
         self.X_train_raw = X_train
