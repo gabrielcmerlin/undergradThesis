@@ -12,6 +12,7 @@ import gc
 
 from aeon.regression.convolution_based import RocketRegressor
 from train_utils import calculate_metrics, scatter_ytrue_ypred
+from xgboost import XGBRegressor
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,11 +34,11 @@ EXPERIMENT_DATE = time.strftime("%Y%m%d_%H%M%S")
 RESULTS_DIR = '../outputs/'
 
 # Fix random seeds for reproducibility.
-seed = 42
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
@@ -65,10 +66,14 @@ def wrap_results(metrics, model_name, dataset_name, elapsed, best_loss=None):
     results_data_dir['time'].append(elapsed)
 
     os.makedirs(f"{RESULTS_DIR}results", exist_ok=True)
-    pd.DataFrame(results_data_dir).to_csv(
-        f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv",
-        index=False
-    )
+    results_path = f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv"
+    df = pd.DataFrame(results_data_dir)
+    df.to_csv(
+        results_path,
+        mode='a',
+        index=False,
+        header=not os.path.exists(results_path)
+)
 
 def main():
     # Load config.yaml.
@@ -99,10 +104,8 @@ def main():
 
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
-            if model_name == 'ROCKET':
-                print('dataset instantiation')
-                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
-            else:
+
+            if model_name not in ['ROCKET', 'XGBoost']:
                 datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
                 train_loader, test_loader = datam.load_dataloader_for_training()
 
@@ -111,19 +114,33 @@ def main():
                 model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
                 model.to(device)
             elif model_name == "ROCKET":
-                print('creating rocket')
+                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
+
                 model = RocketRegressor()
 
-                print('fittando')
                 start = time.time()
                 model.fit(datam.X_train, datam.y_train)
                 elapsed = time.time() - start
 
-                print('predizeni')
                 y_pred = model.predict(datam.X_test)
                 metrics = calculate_metrics(datam.y_test, y_pred)
                 wrap_results(metrics, model_name, dataset_name, elapsed)
 
+                continue
+            elif model_name == "XGBoost":
+                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
+
+                # XGBoost using default parameters, only number of trees specified
+                model = XGBRegressor(n_estimators=100, random_state=SEED)
+
+                start = time.time()
+                model.fit(datam.X_train.reshape(len(datam.X_train), -1), datam.y_train)
+                elapsed = time.time() - start
+
+                y_pred = model.predict(datam.X_test.reshape(len(datam.X_test), -1))
+                metrics = calculate_metrics(datam.y_test, y_pred)
+                wrap_results(metrics, model_name, dataset_name, elapsed)
+                
                 continue
             else:
                 # Infer first batch for input size.

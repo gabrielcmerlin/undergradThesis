@@ -3,7 +3,8 @@ models:
   # - 'FCN'
   # - 'ConvTran'
   # - 'TSERMamba'
-  - 'ROCKET'
+  # - 'ROCKET'
+  - XGBoost
 
 datasets: 
   # - AppliancesEnergy
