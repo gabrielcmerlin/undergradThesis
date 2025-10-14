@@ -1,12 +1,17 @@
 import os
 import sys
 import time
+import random
+
+import numpy as np
 import pandas as pd
+import torch
+
 import json
 import gc
-import random
-import numpy as np
-import torch
+
+from aeon.regression.convolution_based import RocketRegressor
+from train_utils import calculate_metrics, scatter_ytrue_ypred
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,6 +41,34 @@ torch.cuda.manual_seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
+def wrap_results(metrics, model_name, dataset_name, elapsed, best_loss=None):
+    results_data_dir = {
+            'model': [], 'dataset': [], 'mse': [],
+            'mae': [], 'r2': [], 'rmse': [],
+            'best_train_loss': [], 'time': []
+    }
+    
+    # Scatter plot.
+    os.makedirs(f'{RESULTS_DIR}scatter/{model_name}', exist_ok=True)
+    scatter_ytrue_ypred(metrics['y_true'], metrics['y_pred'],
+                title=f"{dataset_name}",
+                save_path=f'{RESULTS_DIR}scatter/{model_name}/{model_name}_{dataset_name}.png')
+
+    # Store results.
+    results_data_dir['model'].append(model_name)
+    results_data_dir['dataset'].append(dataset_name)
+    results_data_dir['mse'].append(metrics['mse'])
+    results_data_dir['mae'].append(metrics['mae'])
+    results_data_dir['r2'].append(metrics['r2'])
+    results_data_dir['rmse'].append(metrics['rmse'])
+    results_data_dir['best_train_loss'].append(best_loss)
+    results_data_dir['time'].append(elapsed)
+
+    os.makedirs(f"{RESULTS_DIR}results", exist_ok=True)
+    pd.DataFrame(results_data_dir).to_csv(
+        f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv",
+        index=False
+    )
 
 def main():
     # Load config.yaml.
@@ -54,33 +87,44 @@ def main():
     for model_name in MODELS:
         print(f"\n=== Model: {model_name} ===")
 
-        results_data_dir = {
-            'model': [], 'dataset': [], 'mse': [],
-            'mae': [], 'r2': [], 'rmse': [],
-            'best_train_loss': [], 'time': []
-        }
-
         # Decide which functions and dataset class to use based on the model.
         if model_name.lower() == "tsermamba":
             train_fn = train_TSERMamba
             eval_fn = evaluate_TSERMamba
             dataset_class = DatasetManagerTSERMamba
-            scatter_fn = scatter_ytrue_ypred  # TSERMamba still uses scatter for plotting
         else:
             train_fn = train_model
             eval_fn = evaluate_model
             dataset_class = DatasetManager
-            scatter_fn = scatter_ytrue_ypred
 
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
-            datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
-            train_loader, test_loader = datam.load_dataloader_for_training()
+            if model_name == 'ROCKET':
+                print('dataset instantiation')
+                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
+            else:
+                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
+                train_loader, test_loader = datam.load_dataloader_for_training()
 
-            if model_name.lower() == "tsermamba":
+            if model_name == "TSERMamba":
                 manager = ModelManager(model_name)
                 model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
                 model.to(device)
+            elif model_name == "ROCKET":
+                print('creating rocket')
+                model = RocketRegressor()
+
+                print('fittando')
+                start = time.time()
+                model.fit(datam.X_train, datam.y_train)
+                elapsed = time.time() - start
+
+                print('predizeni')
+                y_pred = model.predict(datam.X_test)
+                metrics = calculate_metrics(datam.y_test, y_pred)
+                wrap_results(metrics, model_name, dataset_name, elapsed)
+
+                continue
             else:
                 # Infer first batch for input size.
                 first_batch = next(iter(train_loader))
@@ -125,27 +169,7 @@ def main():
             # Evaluate model.
             metrics = eval_fn(trained_model, test_loader, criterion, device, batch_divisions=BATCH_DIVISIONS)
 
-            # Scatter plot.
-            os.makedirs(f'{RESULTS_DIR}scatter/{model_name}', exist_ok=True)
-            scatter_fn(metrics['y_true'], metrics['y_pred'],
-                       title=f"{dataset_name}",
-                       save_path=f'{RESULTS_DIR}scatter/{model_name}/{model_name}_{dataset_name}.png')
-
-            # Store results.
-            results_data_dir['model'].append(model_name)
-            results_data_dir['dataset'].append(dataset_name)
-            results_data_dir['mse'].append(metrics['mse'])
-            results_data_dir['mae'].append(metrics['mae'])
-            results_data_dir['r2'].append(metrics['r2'])
-            results_data_dir['rmse'].append(metrics['rmse'])
-            results_data_dir['best_train_loss'].append(best_loss)
-            results_data_dir['time'].append(elapsed)
-
-            os.makedirs(f"{RESULTS_DIR}results", exist_ok=True)
-            pd.DataFrame(results_data_dir).to_csv(
-                f"{RESULTS_DIR}results/{model_name}_{EXPERIMENT_DATE}.csv",
-                index=False
-            )
+            wrap_results(metrics, model_name, dataset_name, elapsed, best_loss)
 
             # Clean memory.
             del trained_model, test_loader

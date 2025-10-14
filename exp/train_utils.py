@@ -134,9 +134,12 @@ def evaluate_model(model, test_loader, criterion, device, batch_divisions=1):
     avg_loss = total_loss / len(test_loader.dataset)
     print(f"\nTest Loss: {avg_loss:.6f}")
 
-    mse = mean_squared_error(all_labels, all_preds)
-    mae = mean_absolute_error(all_labels, all_preds)
-    r2 = r2_score(all_labels, all_preds)
+    return calculate_metrics(all_labels, all_preds)
+
+def calculate_metrics(y_test, y_pred):
+    mse = mean_squared_error(y_test, y_pred)
+    mae = mean_absolute_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
     rmse = np.sqrt(mse)
 
     return {
@@ -144,8 +147,8 @@ def evaluate_model(model, test_loader, criterion, device, batch_divisions=1):
         'mae': mae,
         'r2': r2,
         'rmse': rmse,
-        'y_true': all_labels,
-        'y_pred': all_preds
+        'y_true': y_test,
+        'y_pred': y_pred
     }
 
 def scatter_ytrue_ypred(y_true, y_pred, title, save_path=None):

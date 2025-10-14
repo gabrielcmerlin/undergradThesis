@@ -14,11 +14,12 @@ class DatasetManager:
     different datasets without modifying the main code.
     """
 
-    def __init__(self, name, device, batch_size):
+    def __init__(self, name, device, batch_size, is_transforming = True):
         self.dtype = torch.get_default_dtype()
         self.dataset_name = name
         self.batch_size = batch_size
         self.device = device
+        self.is_trasforming = is_transforming
         self.load_data()
 
     def transform(self, X, y):
@@ -48,8 +49,12 @@ class DatasetManager:
         if X_test.ndim == 3 and X_test.shape[1] == 1:
             X_test = X_test[:, 0, :]
 
-        self.X_train, self.y_train = self.transform(X_train, y_train)
-        self.X_test, self.y_test = self.transform(X_test, y_test)
+        if self.is_trasforming:
+            self.X_train, self.y_train = self.transform(X_train, y_train)
+            self.X_test, self.y_test = self.transform(X_test, y_test)
+        else:
+            self.X_train, self.y_train = X_train, y_train
+            self.X_test, self.y_test = X_test, y_test
 
     def load_dataloader_for_training(self):
         """Create training and testing DataLoaders ready for use."""
