@@ -20,16 +20,16 @@ datasets:
   # - Covid3Month
   # - HouseholdPowerConsumption1    
   # - FloodModeling2
-  - IEEEPPG
+  # - IEEEPPG
 
-  # - NewsHeadlineSentiment
-  # - NewsTitleSentiment
-  # - AustraliaRainfall
-  # - PPGDalia
+  - NewsHeadlineSentiment
+  - NewsTitleSentiment
+  - AustraliaRainfall
+  - PPGDalia
   
-  # - BIDMC32SpO2
-  # - BIDMC32HR
-  # - BIDMC32RR
+  - BIDMC32SpO2
+  - BIDMC32HR
+  - BIDMC32RR
 
 # Training hyperparameters
 criterion: 'MSELoss'
