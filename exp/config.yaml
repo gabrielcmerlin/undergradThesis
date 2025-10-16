@@ -1,9 +1,9 @@
 models: 
-  # - 'MLP'
+  - 'MLP'
   # - 'FCN'
   # - 'ConvTran'
   # - 'TSERMamba'
-  - 'MiniROCKET'
+  # - 'MiniROCKET'
   # - 'XGBoost'
   # - 'RandomForest'
 
@@ -28,9 +28,60 @@ datasets:
   # - PPGDalia
   # - AustraliaRainfall
   
-  - BIDMC32SpO2
-  - BIDMC32HR
-  - BIDMC32RR
+  # - BIDMC32SpO2
+  # - BIDMC32HR
+  # - BIDMC32RR
+
+    # Outros datasets
+  - AcousticContaminationMadrid
+  - AluminiumConcentration
+  - BarCrawl6min
+  - BeijingIntAirportPM25Quality
+  - BenzeneConcentration
+
+  - BinanceCoinSentiment
+  - BitcoinSentiment
+  - BoronConcentration
+  - CalciumConcentration
+  - CardanoSentiment
+  - ChilledWaterPredictor
+  - CopperConcentration
+  - Covid19Andalusia
+  - DailyOilGasPrices
+  - DailyTemperatureLatitude
+
+  - DhakaHourlyAirQuality
+  - ElectricityPredictor
+  - ElectricMotorTemperature
+  - EthereumSentiment
+  - GasSensorArrayAcetone
+  - GasSensorArrayEthanol
+  - HotwaterPredictor
+  - IronConcentration
+  - LPGasMonitoringHomeActivity
+  - MadridPM10Quality
+
+  - MagnesiumConcentration
+  - ManganeseConcentration
+  - MethaneMonitoringHomeActivity
+  - MetroInterstateTrafficVolume
+  - NaturalGasPricesSentiment
+  - OccupancyDetectionLight
+  - ParkingBirmingham
+  - PhosphorusConcentration
+  - PotassiumConcentration
+  - PrecipitationAndalusia
+
+  - SierraNevadaMountainsSnow
+  - SodiumConcentration
+  - SolarRadiationAndalusia
+  - SteamPredictor
+  - SulphurConcentration
+  - TetuanEnergyConsumption
+  - VentilatorPressure
+  - WaveDataTension
+  - WindTurbinePower
+  - ZincConcentration
 
 # Training hyperparameters
 criterion: 'MSELoss'
