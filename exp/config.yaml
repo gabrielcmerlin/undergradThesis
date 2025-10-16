@@ -1,11 +1,23 @@
 models: 
-  - 'MLP'
+  # - 'MLP'
   # - 'FCN'
   # - 'ConvTran'
   # - 'TSERMamba'
   # - 'MiniROCKET'
-  # - 'XGBoost'
+  - 'XGBoost'
   # - 'RandomForest'
+
+# Training hyperparameters
+criterion: 'MSELoss'
+optimizer: 'Adam'
+lr: 0.001
+betas: [0.9, 0.999]
+eps: 1e-8
+num_epochs: 2
+patience: 50
+batch_size: 32
+batch_divisions: 1
+runs: 2
 
 datasets: 
   # - AppliancesEnergy
@@ -18,7 +30,7 @@ datasets:
   # - LiveFuelMoistureContent
   # - BeijingPM25Quality
 
-  # - Covid3Month
+  - Covid3Month
   # - HouseholdPowerConsumption1    
   # - FloodModeling2
   # - IEEEPPG
@@ -32,64 +44,53 @@ datasets:
   # - BIDMC32HR
   # - BIDMC32RR
 
-    # Outros datasets
-  - AcousticContaminationMadrid
-  - AluminiumConcentration
-  - BarCrawl6min
-  - BeijingIntAirportPM25Quality
-  - BenzeneConcentration
+  # Outros datasets <----------------------------------------
+  # - AcousticContaminationMadrid
+  # - AluminiumConcentration
+  # - BarCrawl6min
+  # - BeijingIntAirportPM25Quality
+  # - BenzeneConcentration
 
-  - BinanceCoinSentiment
-  - BitcoinSentiment
-  - BoronConcentration
-  - CalciumConcentration
-  - CardanoSentiment
-  - ChilledWaterPredictor
-  - CopperConcentration
-  - Covid19Andalusia
-  - DailyOilGasPrices
-  - DailyTemperatureLatitude
+  # - BinanceCoinSentiment
+  # - BitcoinSentiment
+  # - BoronConcentration
+  # - CalciumConcentration
+  # - CardanoSentiment
+  # - ChilledWaterPredictor
+  # - CopperConcentration
+  # - Covid19Andalusia
+  # - DailyOilGasPrices
+  # - DailyTemperatureLatitude
 
-  - DhakaHourlyAirQuality
-  - ElectricityPredictor
-  - ElectricMotorTemperature
-  - EthereumSentiment
-  - GasSensorArrayAcetone
-  - GasSensorArrayEthanol
-  - HotwaterPredictor
-  - IronConcentration
-  - LPGasMonitoringHomeActivity
-  - MadridPM10Quality
+  # - DhakaHourlyAirQuality
+  # - ElectricityPredictor
+  # - ElectricMotorTemperature
+  # - EthereumSentiment
+  # - GasSensorArrayAcetone
+  # - GasSensorArrayEthanol
+  # - HotwaterPredictor
+  # - IronConcentration
+  # - LPGasMonitoringHomeActivity
+  # - MadridPM10Quality
 
-  - MagnesiumConcentration
-  - ManganeseConcentration
-  - MethaneMonitoringHomeActivity
-  - MetroInterstateTrafficVolume
-  - NaturalGasPricesSentiment
-  - OccupancyDetectionLight
-  - ParkingBirmingham
-  - PhosphorusConcentration
-  - PotassiumConcentration
-  - PrecipitationAndalusia
+  # - MagnesiumConcentration
+  # - ManganeseConcentration
+  # - MethaneMonitoringHomeActivity
+  # - MetroInterstateTrafficVolume
+  # - NaturalGasPricesSentiment
+  # - OccupancyDetectionLight
+  # - ParkingBirmingham
+  # - PhosphorusConcentration
+  # - PotassiumConcentration
+  # - PrecipitationAndalusia
 
-  - SierraNevadaMountainsSnow
-  - SodiumConcentration
-  - SolarRadiationAndalusia
-  - SteamPredictor
-  - SulphurConcentration
-  - TetuanEnergyConsumption
-  - VentilatorPressure
-  - WaveDataTension
-  - WindTurbinePower
-  - ZincConcentration
-
-# Training hyperparameters
-criterion: 'MSELoss'
-optimizer: 'Adam'
-lr: 0.001
-betas: [0.9, 0.999]
-eps: 1e-8
-num_epochs: 2000
-patience: 50
-batch_size: 32
-batch_divisions: 1
+  # - SierraNevadaMountainsSnow
+  # - SodiumConcentration
+  # - SolarRadiationAndalusia
+  # - SteamPredictor
+  # - SulphurConcentration
+  # - TetuanEnergyConsumption
+  # - VentilatorPressure
+  # - WaveDataTension
+  # - WindTurbinePower
+  # - ZincConcentration
