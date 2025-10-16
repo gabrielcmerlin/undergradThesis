@@ -3,8 +3,9 @@ models:
   # - 'FCN'
   # - 'ConvTran'
   # - 'TSERMamba'
-  # - 'ROCKET'
-  - XGBoost
+  - 'MiniROCKET'
+  # - 'XGBoost'
+  # - 'RandomForest'
 
 datasets: 
   # - AppliancesEnergy
@@ -22,10 +23,10 @@ datasets:
   # - FloodModeling2
   # - IEEEPPG
 
-  - NewsHeadlineSentiment
-  - NewsTitleSentiment
-  - AustraliaRainfall
-  - PPGDalia
+  # - NewsHeadlineSentiment
+  # - NewsTitleSentiment
+  # - PPGDalia
+  # - AustraliaRainfall
   
   - BIDMC32SpO2
   - BIDMC32HR

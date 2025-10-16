@@ -10,9 +10,10 @@ import torch
 import json
 import gc
 
-from aeon.regression.convolution_based import RocketRegressor
+from aeon.regression.convolution_based import MiniRocketRegressor
 from train_utils import calculate_metrics, scatter_ytrue_ypred
 from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 # Add BASE folder (parent of exp/) to sys.path.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -105,7 +106,7 @@ def main():
         for dataset_name in DATASETS:
             print(f"\n--- Dataset {dataset_name} ---")
 
-            if model_name not in ['ROCKET', 'XGBoost']:
+            if model_name not in ['MiniROCKET', 'XGBoost', 'RandomForest']:
                 datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE)
                 train_loader, test_loader = datam.load_dataloader_for_training()
 
@@ -113,10 +114,10 @@ def main():
                 manager = ModelManager(model_name)
                 model = manager.get_model(enc_in=datam.dims, seq_len=datam.seq_len)
                 model.to(device)
-            elif model_name == "ROCKET":
+            elif model_name == "MiniROCKET":
                 datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
 
-                model = RocketRegressor()
+                model = MiniRocketRegressor()
 
                 start = time.time()
                 model.fit(datam.X_train, datam.y_train)
@@ -132,6 +133,20 @@ def main():
 
                 # XGBoost using default parameters, only number of trees specified
                 model = XGBRegressor(n_estimators=100, random_state=SEED)
+
+                start = time.time()
+                model.fit(datam.X_train.reshape(len(datam.X_train), -1), datam.y_train)
+                elapsed = time.time() - start
+
+                y_pred = model.predict(datam.X_test.reshape(len(datam.X_test), -1))
+                metrics = calculate_metrics(datam.y_test, y_pred)
+                wrap_results(metrics, model_name, dataset_name, elapsed)
+                
+                continue
+            elif model_name == "RandomForest":
+                datam = dataset_class(name=dataset_name, device=device, batch_size=BATCH_SIZE, is_transforming=False)
+
+                model = RandomForestRegressor(n_estimators=100, random_state=SEED)
 
                 start = time.time()
                 model.fit(datam.X_train.reshape(len(datam.X_train), -1), datam.y_train)
