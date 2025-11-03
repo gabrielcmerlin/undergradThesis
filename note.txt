@@ -1,11 +1,10 @@
-- MOJITO (gpu: 42 exp)
+- MINATEL (gpu: 2 exp)
   - TSERMamba
 
   -> 1 Ppg
   -> 1 Australia
 
-- KENZO (gpu: 2 exp)
+- KENZO
   - ConvTran
 
-  -> 1 02
   -> 1 HR

@@ -2,7 +2,7 @@ models:
   # - 'MLP'
   # - 'FCN'
 
-  # - 'TSERMamba'
+  - 'TSERMamba'
 
   # - 'ConvTran'
   
@@ -16,11 +16,11 @@ optimizer: 'Adam'
 lr: 0.001
 betas: [0.9, 0.999]
 eps: 1e-8
-num_epochs: 2
+num_epochs: 2000
 patience: 50
 batch_size: 32
 batch_divisions: 1
-runs: 2
+runs: 1
 
 datasets: 
   # - AppliancesEnergy
@@ -33,14 +33,14 @@ datasets:
   # - LiveFuelMoistureContent
   # - BeijingPM25Quality
 
-  - Covid3Month
+  # - Covid3Month
   # - HouseholdPowerConsumption1    
   # - FloodModeling2
   # - IEEEPPG
 
   # - NewsHeadlineSentiment
   # - NewsTitleSentiment
-  # - PPGDalia
+  - PPGDalia
   # - AustraliaRainfall
   
   # - BIDMC32SpO2
