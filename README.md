@@ -46,16 +46,16 @@ bash Miniconda3-latest-Linux-x86_64.sh
 rm Miniconda3-latest-Linux-x86_64.sh
 ```
 
-### Installing requisites:
-```bash
-conda env create -f environment.yaml
-conda activate tsermamba
-```
-
 ### Downloading code:
 ```bash
 git clone https://github.com/gabrielcmerlin/TSERMamba.git
 cd TSERMamba
+```
+
+### Installing requisites:
+```bash
+conda env create -f environment.yaml
+conda activate tsermamba
 ```
 
 ## Run
