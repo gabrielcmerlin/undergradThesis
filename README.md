@@ -67,4 +67,4 @@ python3 exp/main.py -c config.yaml
 ```
 
 ### Result Analysis
-Run the Python Notebook named 'analysis.ipynb' located in 'outputs/'
+Run the Python Notebook named 'analysis.ipynb' located in 'outputs/'.
