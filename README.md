@@ -66,7 +66,7 @@ conda activate tsermamba
 After updating your settings in the ```config.yaml``` file, you can run the commands below.
 ```bash
 export PYTHONPATH=$(pwd)
-python3 exp/main.py -c config.yaml
+python3 exp/main.py -c exp/config.yaml
 ```
 
 ### Result Analysis
