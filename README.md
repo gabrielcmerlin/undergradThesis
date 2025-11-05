@@ -63,7 +63,7 @@ conda activate tsermamba
 ## Run
 
 ### Experiments
-After updating your settings in the ```config.yaml``` file, you can run the commands below.
+After updating your settings in the ```exp/config.yaml``` file, you can run the commands below.
 ```bash
 export PYTHONPATH=$(pwd)
 python3 exp/main.py -c exp/config.yaml
