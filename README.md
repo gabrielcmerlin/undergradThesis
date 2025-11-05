@@ -2,7 +2,6 @@
 
 ## Description
 
-
 Time series analysis is fundamental in critical domains such as health, industry, and finance, driving the search for Deep Learning (DL) models capable of handling the complexity and high dimensionality of the data. Architectures such as Transformers, with their self-attention mechanism, and Mamba (based on State Space Models - SSM), with their linear complexity and content selectivity, have emerged as cutting-edge alternatives.
 
 This work aimed to analyze the feasibility and performance of these modern architectures for the task of Time Series Extrinsic Regression (TSER), which consists of mapping a complete time series to an external continuous target variable. To this end, two state-of-the-art models originally proposed for Time Series Classification (TSC) were adapted: ConvTran (based on Transformer) and TSCMamba (based on SSM).
