@@ -1,1 +1,55 @@
 # Adapting Transformers and Mamba for Time Series Extrinsic Regression
+
+## Description
+
+Time series analysis is fundamental in critical domains such as health, industry, and finance, driving the search for Deep Learning (DL) models capable of handling the complexity and high dimensionality of the data. Architectures such as Transformers, with their self-attention mechanism, and Mamba (based on State Space Models - SSM), with their linear complexity and content selectivity, have emerged as cutting-edge alternatives.
+
+This work aimed to analyze the feasibility and performance of these modern architectures for the task of Time Series Extrinsic Regression (TSER), which consists of mapping a complete time series to an external continuous target variable. To this end, two state-of-the-art models originally proposed for Time Series Classification (TSC) were adapted: ConvTran (based on Transformer) and TSCMamba (based on SSM).
+
+The adapted models were rigorously compared to established baselines in a collection of reference datasets. The results demonstrate that the high investment in architectural complexity and hardware cost of the adapted DL architectures does not translate into superior performance or stability for the TSER task. In contrast, MiniROCKET and Random Forest established themselves as the statistical leaders in the global ranking. It is concluded that, in the current state of the art, DL does not justify the investment for most TSER problems, reinforcing the superiority of more efficient and robust approaches.
+
+## Structure
+
+TODO
+
+## How to start
+
+### Updating system
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install build-essential
+sudo apt install nvidia-cuda-toolkit
+```
+
+### Installing Miniconda
+
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+### Installing requisites:
+```bash
+conda env create -f environment.yaml
+conda activate tsermamba
+```
+
+### Downloading code:
+```bash
+git clone https://github.com/gabrielcmerlin/TSERMamba.git
+cd TSERMamba
+```
+
+## Run
+
+### Experiments
+After updating your settings in the ```config.yaml``` file, you can run the commands below.
+```bash
+export PYTHONPATH=$(pwd)
+python3 exp/main.py -c config.yaml
+```
+
+### Result Analysis
+Run the Python Notebook named 'analysis.ipynb' located in 'outputs/'
